@@ -39,4 +39,14 @@ import com.google.gwt.i18n.client.Messages;
 	   String closed();
 	   
 	   String payment();
+	   
+	   String createNewEvent();
+
+	   String name();
+	
+	   String date();
+	   
+	   String participants();
+	   
+	   
 	}

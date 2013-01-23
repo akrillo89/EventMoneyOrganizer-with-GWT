@@ -5,6 +5,7 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.Window;
@@ -72,10 +73,13 @@ public class Mainpage {
 	    mainPanel.ensureDebugId("cwSplitLayoutPanel");
 	    
 	    HorizontalPanel header = new HorizontalPanel();
+	    header.setWidth("800px");
+	    header.setStyleName("header");
 	    header.add(new Widget_ListBoxChangeLanguage());
 	    Widget footer = new Label("Footer");
 	    
-	    
+	    //set content id
+	    contentPanel.setStyleName("content");
 	    
 	    //add all items to our layout
 	    mainPanel.add(contentPanel);
@@ -131,7 +135,12 @@ public class Mainpage {
 	   */
 	private Widget createEventItem() {
 		Tree eventPanel = new Tree();
+		
+		final TreeItem createNewEvent = eventPanel.addItem(createEasyItem(messages.createNewEvent(), Resources.INSTANCE.createNewEventIcon()));
+		
+		
 		final TreeItem runningEvents = eventPanel.addTextItem(messages.running() + " " + messages.events());
+		
 		final TreeItem runningEvents_1 = addItem(runningEvents, Resources.INSTANCE.eventIcon(), "Test");
 		final TreeItem runningEvents_2 = addItem(runningEvents, Resources.INSTANCE.eventIcon(), "Test 2");
 		
@@ -170,6 +179,10 @@ public class Mainpage {
 		        {
 		        	contentPanel.setWidget(new Widget_FlexExampleTable(4));
 		        }
+		        else if(event.getSelectedItem() == createNewEvent)
+		        {
+		        	contentPanel.setWidget(new Widget_CreateEvent());
+		        }
 		        else
 		        {
 		        	Window.alert("other");
@@ -201,6 +214,9 @@ public class Mainpage {
 		paymentPanelRoot.setState(true);
 		
 		paymentPanel.addItem(createEasyItem("Test1", Resources.INSTANCE.eventIcon()));
+		
+		
+		
 		return paymentPanel;
 	}
 
@@ -212,8 +228,9 @@ public class Mainpage {
 		sb.append(SafeHtmlUtils.fromTrustedString(AbstractImagePrototype
 				.create(image).getHTML()));
 		sb.appendEscaped(" ").appendEscaped(text);
-		
-		return new HTML(sb.toSafeHtml());
+		HTML res = new HTML(sb.toSafeHtml());
+		res.setStyleName("item");
+		return res;
 		
 		
 	}
@@ -224,7 +241,9 @@ public class Mainpage {
 				.create(image).getHTML()));
 		sb.appendEscaped(" ").appendEscaped(label);
 		
+		HTML res = new HTML(sb.toSafeHtml());
+		res.setStyleName("item");
 		
-		return root.addItem(sb.toSafeHtml());
+		return root.addItem(res);
 	}
 }
