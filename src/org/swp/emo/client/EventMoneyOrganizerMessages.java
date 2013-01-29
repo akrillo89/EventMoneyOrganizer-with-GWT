@@ -81,5 +81,4 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 	   String fillAllFields();
 		
 	   
-	   
 	}

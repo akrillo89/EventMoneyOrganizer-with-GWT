@@ -157,6 +157,8 @@ public class Mainpage {
 		
 		
 		runningEvents = eventPanel.addTextItem(messages.running() + " " + messages.events());
+	
+
 		
 		
 		
