@@ -3,11 +3,18 @@ package org.swp.emo.client;
 
 
 import java.util.Date;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 import org.swp.emo.shared.DB_UsermanagementService;
 import org.swp.emo.shared.DB_UsermanagementServiceAsync;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Cookies;
@@ -20,11 +27,12 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-
+import java.util.Iterator;
 public class Usermanagement {
 	
 	//DB_UsermanagementServiceImpl db_usermanagement = new DB_UsermanagementServiceImpl();
@@ -32,7 +40,7 @@ public class Usermanagement {
 	private DB_UsermanagementServiceAsync userSvc = GWT.create(DB_UsermanagementService.class);
 	
 	private EventMoneyOrganizerMessages messages = GWT.create(EventMoneyOrganizerMessages.class);
-	
+	Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 	//register widget
 	final DialogBox registerDialog = createRegisterDialogBox();
 	
@@ -111,10 +119,6 @@ public class Usermanagement {
 	
 	private void checkLogin(String username, String password) {
 		
-		
-		
-		
-
 	    // Set up the callback object.
 	    AsyncCallback<Integer> callback = new AsyncCallback<Integer>() {
 	      public void onFailure(Throwable caught) {
@@ -150,6 +154,9 @@ public class Usermanagement {
 	}
 	
 	private DialogBox createRegisterDialogBox() {
+		 final Registration reg = new Registration();
+		 final Label label = new Label();
+		 
 	    // Create a dialog box and set the caption text
 	    final DialogBox dialogBox = new DialogBox();
 	    dialogBox.ensureDebugId("cwDialogBox");
@@ -165,23 +172,50 @@ public class Usermanagement {
 	    HTML username_text = new HTML(messages.username());
 	    dialogContents.add(username_text);
 
-	    TextBox username_input = new TextBox();
+	    final TextBox username_input = new TextBox();
 	    username_input.addStyleName("input"); //See here same CSS Class is used
 		dialogContents.add(username_input);
-
+		/*username_input.addChangeHandler(new ChangeHandler(){
+       
+           
+			
+			public void onChange(ChangeEvent event) {
+				reg.setUsername(username_input.getText());
+				Set<ConstraintViolation<Registration>> violationsUser = validator.validate(reg);
+				label.setText( violationsUser.iterator().next().getMessage());
+				
+			}
+			
+		});*/
+		
+		
 	    // Add some text to the top of the dialog
-	    HTML email_text = new HTML(messages.email());
+	     HTML email_text = new HTML(messages.email());
 	    dialogContents.add(email_text);
 
-	    TextBox email_input = new TextBox();
+	     final TextBox email_input = new TextBox();
 	    email_input.addStyleName("input"); //See here same CSS Class is used
 		dialogContents.add(email_input);
+		
+	/*	email_input.addChangeHandler(new ChangeHandler(){
+
+		
+			public void onChange(ChangeEvent event) {
+				reg.setEmail(email_input.getText());
+				Set<ConstraintViolation<Registration>> violationsMail = validator.validate(reg);
+				  ///Window.alert;
+				  label.setText( violationsMail.iterator().next().getMessage());
+				  
+				
+			}
+			
+		});*/
 
 	    // Add some text to the top of the dialog
 	    HTML pass1_text = new HTML(messages.password());
 	    dialogContents.add(pass1_text);
 
-	    TextBox pass1_input = new PasswordTextBox();
+	    final TextBox pass1_input = new PasswordTextBox();
 	    pass1_input.addStyleName("input"); //See here same CSS Class is used
 		dialogContents.add(pass1_input);
 
@@ -189,7 +223,7 @@ public class Usermanagement {
 	    HTML pass2_text = new HTML("Repeat Password");
 	    dialogContents.add(pass2_text);
 
-	    TextBox pass2_input = new PasswordTextBox();
+	    final TextBox pass2_input = new PasswordTextBox();
 	    pass1_input.addStyleName("input"); //See here same CSS Class is used
 		dialogContents.add(pass2_input);
 
@@ -199,10 +233,36 @@ public class Usermanagement {
 	    Button register_button = new Button("register");
 	    register_button.addClickHandler(new ClickHandler() {
 		      public void onClick(ClickEvent event) {
-		      
 		    	  
-			}
+		    reg.setUsername(username_input.getText());
+		    reg.setEmail(email_input.getText());
+			//Set<ConstraintViolation<Registration>> violationsMail = validator.validate(reg);
+		    	
+		    	   Set<ConstraintViolation<Registration>> constraintViolations = validator.validate(reg);
+		    	      if(constraintViolations.size() > 0)
+		    	      {
+		    	         Iterator<ConstraintViolation<Registration>> iterator = constraintViolations.iterator();
+		    	         String str = new String();
+		    	         while(iterator.hasNext())
+		    	         {
+		    	            ConstraintViolation<Registration> cv = iterator.next();
+		    	           String newLine =System.getProperty("line.separator","\n");
+		    	            str = str + cv.getPropertyPath().toString()+" "+cv.getMessage()+newLine;
+		    	           // label.setText(cv.getMessage());
+		    	            //label.setText(cv.getPropertyPath().toString());
+		    	            
+		    	         }
+		    	         label.setText(str);
+		    	         Window.alert(str);
+		    	      }      
+		    	   } 
+			
 	    });
+	    
+		
+		 dialogContents.add(label);
+		 label.setText("dd");
+		 label.setStyleName("error");
 	    dialogContents.add(register_button);
 	    dialogContents.setCellHorizontalAlignment(register_button,
 	        HasHorizontalAlignment.ALIGN_LEFT);

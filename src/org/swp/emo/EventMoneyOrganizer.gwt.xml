@@ -26,6 +26,10 @@
 
  <entry-point class='org.swp.emo.client.EventMoneyOrganizer'/>
  <extend-property name="locale" values="de" /> 
- 
-
+  <!-- Validation                        -->
+<inherits name="org.hibernate.validator.HibernateValidator" />
+<replace-with
+  class="org.swp.emo.client.SampleValidatorFactory">
+  <when-type-is class="javax.validation.ValidatorFactory" />
+</replace-with>
 </module>

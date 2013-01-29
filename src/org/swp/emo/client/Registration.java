@@ -1,10 +1,25 @@
 package org.swp.emo.client;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.Email;
+
 public class Registration {
     Long id;
+    
+   
+    @Size(min = 4, max = 16)
     String username;
+    
+    @Email
     String email;
+    
+    @Min(4)
     String password1;
+    
+    @Min(4)
     String password2;
     public Registration() {
         
