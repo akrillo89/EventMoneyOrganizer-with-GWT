@@ -253,7 +253,7 @@ public class Usermanagement {
 		    	            
 		    	         }
 		    	         label.setText(str);
-		    	         Window.alert(str);
+		    	        // Window.alert(str);
 		    	      }      
 		    	   } 
 			
