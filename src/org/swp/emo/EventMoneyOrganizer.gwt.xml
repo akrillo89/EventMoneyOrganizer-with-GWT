@@ -16,10 +16,14 @@
   <!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
-
+  
+  <!-- Timepicker -->
+  <inherits name="com.summatech.gwt.GwtTimepicker" />
+  
   <!-- Other module inherits                                      -->
   <inherits name="com.google.gwt.i18n.I18N"/>
  <source path="client"/>
+ 
  <source path="shared"/>
 
  <!-- Specify the app entry point class.                         -->
