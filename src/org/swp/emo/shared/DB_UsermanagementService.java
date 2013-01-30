@@ -8,6 +8,6 @@ public interface DB_UsermanagementService extends RemoteService{
 	public Event[] getOpenEvents();
 	public int checkLogin(String username, String password);
 	public void registerEvent(String name, String place, String event_time, boolean proof_compulsory, String payment, String comment, String usermails );
-	public void registerUser(String username, String password, String email);
+	public int registerUser(String username, String password, String email);
 	
 }
