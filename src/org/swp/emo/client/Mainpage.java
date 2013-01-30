@@ -2,8 +2,9 @@ package org.swp.emo.client;
 
 import java.util.Date;
 
+import org.swp.emo.client.content.Event_show;
 import org.swp.emo.client.content.Startpage;
-import org.swp.emo.client.content.Widget_CreateEvent;
+import org.swp.emo.client.content.Event_create;
 import org.swp.emo.client.widget.Widget_FlexExampleTable;
 import org.swp.emo.client.widget.Widget_ListBoxChangeLanguage;
 import org.swp.emo.shared.DB_UsermanagementService;
@@ -12,6 +13,8 @@ import org.swp.emo.shared.Event;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.resources.client.ImageResource;
@@ -23,12 +26,15 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -44,6 +50,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Mainpage {
 	
+	HorizontalPanel header;
+	
 	public StackLayoutPanel leftMenu;
 	
 	//Main structure panel
@@ -54,6 +62,8 @@ public class Mainpage {
 	private static DB_UsermanagementServiceAsync userSvc = GWT.create(DB_UsermanagementService.class);
 	//content
 	public static ScrollPanel contentPanel = new ScrollPanel(new Label("Hallo"));
+	
+	static Event[] openEvents;
 	
 	static TreeItem runningEvents = null;
 	/**
@@ -89,10 +99,32 @@ public class Mainpage {
 	    
 	    mainPanel.ensureDebugId("cwSplitLayoutPanel");
 	    
-	    HorizontalPanel header = new HorizontalPanel();
+	    header = new HorizontalPanel();
 	    header.setWidth("800px");
 	    header.setStyleName("header");
-	    header.add(new Widget_ListBoxChangeLanguage());
+	    
+	    //logout
+	    Button logoutBtn = new Button();
+	    logoutBtn.setText(messages.logout());
+	    logoutBtn.addClickHandler(new ClickHandler() {
+
+			public void onClick(ClickEvent event) {
+				Cookies.removeCookie("EMO");
+				exit();
+				EventMoneyOrganizer.chooseWidget();
+			}
+	    	
+	    });
+	    
+	    header.add(logoutBtn);
+	    HTML headline = new HTML("");
+	    headline.addStyleName("center");
+	    header.add(headline); 
+	    Widget_ListBoxChangeLanguage lang_changer = new Widget_ListBoxChangeLanguage();
+	    lang_changer.setStyleName("right");
+	    header.add(lang_changer);
+	    header.setCellHorizontalAlignment(lang_changer, HasHorizontalAlignment.ALIGN_RIGHT);
+
 	    Widget footer = new Label("Footer");
 	    
 	    //set content id
@@ -169,8 +201,8 @@ public class Mainpage {
 		
 		
 		final TreeItem closedEvents = eventPanel.addTextItem(messages.closed() + " " + messages.events());
-		final TreeItem closedEvents_1 = addItem(closedEvents, Resources.INSTANCE.eventIcon(), "Closed Test");
-		final TreeItem closedEvents_2 = addItem(closedEvents, Resources.INSTANCE.eventIcon(), "Closed Test 2");
+		final TreeItem closedEvents_1 = addItem(closedEvents, Resources.INSTANCE.eventIcon(), "Closed Test",0);
+		final TreeItem closedEvents_2 = addItem(closedEvents, Resources.INSTANCE.eventIcon(), "Closed Test 2",0);
 		
 		//Onclick handler for eventPanel
 		eventPanel.addSelectionHandler(new SelectionHandler<TreeItem>()
@@ -195,11 +227,11 @@ public class Mainpage {
 		        }
 		        else if(event.getSelectedItem() == createNewEvent)
 		        {
-		        	contentPanel.setWidget(new Widget_CreateEvent());
+		        	contentPanel.setWidget(new Event_create());
 		        }
 		        else
 		        {
-		        	Window.alert("other");
+		        	contentPanel.setWidget(new Event_show(openEvents[event.getSelectedItem().getParentItem().getChildIndex(event.getSelectedItem())].id));
 		        }
 		    }
 		});
@@ -221,9 +253,16 @@ public class Mainpage {
 		      }
 
 		      public void onSuccess(Event[] result) {
+		    	  openEvents = new Event[result.length];
 		    	  for(int i = 0 ; i < result.length; i++)
 		    	  {
-		    		  addItem(runningEvents, Resources.INSTANCE.eventIcon(), result[i].name);  
+		    		  Event toAddEvent = new Event();
+		    		  toAddEvent.id = result[i].id;
+		    		  toAddEvent.name = result[i].name;
+		    		  openEvents[i] = toAddEvent;
+		    		  addItem(runningEvents, Resources.INSTANCE.eventIcon(), result[i].name, result[i].id); 
+		    		  
+		    		  
 		    	  }
 		    	  
 		      }
@@ -246,12 +285,12 @@ public class Mainpage {
 	private Widget createPaymentItem() {
 		Tree paymentPanel = new Tree();
 		TreeItem paymentPanelRoot = paymentPanel.addTextItem("Amounts outstanding");
-		addItem(paymentPanelRoot, Resources.INSTANCE.eventIcon(), "Test");
-		addItem(paymentPanelRoot, Resources.INSTANCE.eventIcon(), "Test 2");
+		addItem(paymentPanelRoot, Resources.INSTANCE.eventIcon(), "Test",0);
+		addItem(paymentPanelRoot, Resources.INSTANCE.eventIcon(), "Test 2",0);
 		
 		TreeItem paymentPanelRootClosed = paymentPanel.addTextItem("Amounts paid");
-		addItem(paymentPanelRootClosed, Resources.INSTANCE.eventIcon(), "Closed Test");
-		addItem(paymentPanelRootClosed, Resources.INSTANCE.eventIcon(), "Closed Test 2");
+		addItem(paymentPanelRootClosed, Resources.INSTANCE.eventIcon(), "Closed Test",0);
+		addItem(paymentPanelRootClosed, Resources.INSTANCE.eventIcon(), "Closed Test 2",0);
 		
 		paymentPanelRoot.setState(true);
 		
@@ -277,7 +316,7 @@ public class Mainpage {
 		
 	}
 	
-	private static TreeItem addItem(TreeItem root, ImageResource image, String label) {
+	private static TreeItem addItem(TreeItem root, ImageResource image, String label, int id) {
 		SafeHtmlBuilder sb = new SafeHtmlBuilder();
 		sb.append(SafeHtmlUtils.fromTrustedString(AbstractImagePrototype
 				.create(image).getHTML()));
@@ -285,7 +324,12 @@ public class Mainpage {
 		
 		HTML res = new HTML(sb.toSafeHtml());
 		res.setStyleName("item");
-		
+		res.setTitle(Integer.toString(id));
 		return root.addItem(res);
+	}
+	
+	private void exit() {
+		mainPanel.removeFromParent();
+		header.removeFromParent();
 	}
 }

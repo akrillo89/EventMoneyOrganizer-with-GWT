@@ -80,5 +80,19 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 	   @DefaultMessage("You forgot something")
 	   String fillAllFields();
 		
+	   @DefaultMessage("Something went wrong")
+	   String error();
+
+	   @DefaultMessage("Delete")
+	   String delete();
+
+	   @DefaultMessage("Event deleted")
+	   String eventDeleted();
+
+	   @DefaultMessage("Logout")
+	   String logout();
+
+	   @DefaultMessage("Account created")
+	   String AccountCreated();
 	   
 	}
