@@ -224,7 +224,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 
-		}Window.alert(String.valueOf(res));
+		}
 		return res;
 	}
 

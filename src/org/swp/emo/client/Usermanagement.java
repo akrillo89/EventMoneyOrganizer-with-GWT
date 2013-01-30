@@ -1,6 +1,5 @@
 package org.swp.emo.client;
 
-import java.util.Date;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -11,8 +10,7 @@ import org.swp.emo.shared.DB_UsermanagementService;
 import org.swp.emo.shared.DB_UsermanagementServiceAsync;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Cookies;
@@ -20,7 +18,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ClickListener;
+
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -46,6 +44,8 @@ public class Usermanagement {
 			.getValidator();
 	// register widget
 	final DialogBox registerDialog = createRegisterDialogBox();
+	final DialogBox registerDialogConf = createRegisterUserDialogBox();
+	final DialogBox registerDialogExist = createUserExistDialogBox();
 
 	// login widget
 	HTMLPanel loginpanel = null;
@@ -121,7 +121,7 @@ public class Usermanagement {
 
 				// set cookie for logged in, duration just for current browser
 				// session
-				Date expireDate = new Date();
+				// Date expireDate = new Date();
 				Cookies.setCookie("EMO", Integer.toString(result));
 
 				if (result != -1) {
@@ -143,6 +143,57 @@ public class Usermanagement {
 		loginpanel.removeFromParent();
 		shortLinks.removeFromParent();
 	}
+
+	private DialogBox createRegisterUserDialogBox() {
+		// Create a dialog box to confirm user registration and set the caption
+		// text
+		final DialogBox dialogBoxConf = new DialogBox();
+		dialogBoxConf.ensureDebugId("cwDialogBox");
+		//dialogBoxConf.setText("User created");
+		
+		// Create a table to layout the content
+		VerticalPanel dialogContents = new VerticalPanel();
+		dialogContents.setWidth("100");
+		dialogContents.setSpacing(4);
+		HTML username_text = new HTML("User created");
+		dialogContents.add(username_text);
+
+		dialogBoxConf.setWidget(dialogContents);
+		Button closeButton = new Button("close");
+		closeButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+
+				dialogBoxConf.hide();
+			}
+		});
+		dialogContents.add(closeButton);
+		return dialogBoxConf;
+	}
+	private DialogBox createUserExistDialogBox() {
+		// Create a dialog box to confirm user registration and set the caption
+		// text
+		final DialogBox dialogBoxConf = new DialogBox();
+		dialogBoxConf.ensureDebugId("cwDialogBox");
+		//dialogBoxConf.setText("User Exist");
+
+		// Create a table to layout the content
+		VerticalPanel dialogContents = new VerticalPanel();
+		dialogContents.setWidth("100");
+		dialogContents.setSpacing(4);
+		HTML username_text = new HTML("User Exist");
+		dialogContents.add(username_text);
+		dialogBoxConf.setWidget(dialogContents);
+		Button closeButton = new Button("close");
+		closeButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+
+				dialogBoxConf.hide();
+			}
+		});
+		dialogContents.add(closeButton);
+		return dialogBoxConf;
+	}
+
 
 	private DialogBox createRegisterDialogBox() {
 		final Registration reg = new Registration();
@@ -166,7 +217,6 @@ public class Usermanagement {
 		final TextBox username_input = new TextBox();
 		username_input.addStyleName("input"); // See here same CSS Class is used
 		dialogContents.add(username_input);
-		
 
 		// Add some text to the top of the dialog
 		HTML email_text = new HTML(messages.email());
@@ -200,8 +250,7 @@ public class Usermanagement {
 				reg.setUsername(username_input.getText());
 				reg.setEmail(email_input.getText());
 				reg.setPassword1(pass1_input.getText());
-				// Set<ConstraintViolation<Registration>> violationsMail =
-				// validator.validate(reg);
+				
 				label.setText("");
 				Set<ConstraintViolation<Registration>> constraintViolations = validator
 						.validate(reg);
@@ -227,17 +276,9 @@ public class Usermanagement {
 
 				} else if (constraintViolations.size() == 0) {
 					label.setText("");
-				
-					Integer res=registerUser(reg.getUsername(), reg.getEmail(),
+
+					registerUser(reg.getUsername(), reg.getEmail(),
 							reg.getPassword1());
-				Window.alert(res.toString());
-			//	if (res == 0){
-				//	label.setText("User Exist");
-				//}
-				//else if (res==1){
-					//label.setText("User hinzufügt");
-					
-			//	}
 
 				}
 			}
@@ -269,26 +310,29 @@ public class Usermanagement {
 
 	}
 
-	private int registerUser(String username, String email, String password) {
-   int res = 1;
+	private void registerUser(String username, String email, String password) {
+
 		// Set up the callback object.
 		AsyncCallback<Integer> callbackreg = new AsyncCallback<Integer>() {
 			public void onFailure(Throwable caught) {
 				// TODO: Do something with errors.
 			}
 
-			
 			public void onSuccess(Integer result) {
-				// TODO Auto-generated method stub
 				
-				
+				if (result == 1) {
+					registerDialog.hide();
+					registerDialogConf.show();
+				} else {
+					registerDialogExist.show();
+					
+				}
 			}
-			
+
 		};
 
-		// Make the call to the stock price service.
-		 userSvc.registerUser(username, password, email, callbackreg);
-		return Integer.valueOf(callbackreg.toString());
-		
+
+		userSvc.registerUser(username, password, email, callbackreg);
+
 	}
 }
