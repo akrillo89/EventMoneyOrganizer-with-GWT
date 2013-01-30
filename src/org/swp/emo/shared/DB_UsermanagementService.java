@@ -5,6 +5,8 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("Usermanagement")
 public interface DB_UsermanagementService extends RemoteService{
+	public void deleteEventById(int event_id);
+	public Event getEventData(int event_id);
 	public Event[] getOpenEvents();
 	public int checkLogin(String username, String password);
 	public void registerEvent(String name, String place, String event_time, boolean proof_compulsory, String payment, String comment, String usermails );

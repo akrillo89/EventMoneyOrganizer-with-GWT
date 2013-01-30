@@ -37,6 +37,8 @@ public class Usermanagement {
 	// DB_UsermanagementServiceImpl db_usermanagement = new
 	// DB_UsermanagementServiceImpl();
 
+	final DialogBox dialogBox = new DialogBox();
+	
 	private DB_UsermanagementServiceAsync userSvc = GWT
 			.create(DB_UsermanagementService.class);
 
@@ -117,7 +119,7 @@ public class Usermanagement {
 			}
 
 			public void onSuccess(Integer result) {
-				Window.alert(Integer.toString(result));
+				//Window.alert(Integer.toString(result));
 
 				// set cookie for logged in, duration just for current browser
 				// session
@@ -149,7 +151,7 @@ public class Usermanagement {
 		final Label label = new Label();
 
 		// Create a dialog box and set the caption text
-		final DialogBox dialogBox = new DialogBox();
+		
 		dialogBox.ensureDebugId("cwDialogBox");
 		dialogBox.setText("Register");
 
@@ -274,13 +276,15 @@ public class Usermanagement {
 		// Set up the callback object.
 		AsyncCallback<Integer> callbackreg = new AsyncCallback<Integer>() {
 			public void onFailure(Throwable caught) {
-				// TODO: Do something with errors.
+				EventMoneyOrganizer.notice.setTextAnimatedWithAutohide(messages.error());
+				
 			}
 
 			
 			public void onSuccess(Integer result) {
 				// TODO Auto-generated method stub
-				
+				dialogBox.hide();
+				EventMoneyOrganizer.notice.setTextAnimatedWithAutohide(messages.AccountCreated());
 				
 			}
 			

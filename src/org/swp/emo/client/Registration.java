@@ -13,7 +13,7 @@ public class Registration {
     @Size(min = 4, max = 16)
     String username;
     
-    @Email
+    
     String email;
     
     @Min(4)

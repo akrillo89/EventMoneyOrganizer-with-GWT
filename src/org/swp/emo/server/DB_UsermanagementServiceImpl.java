@@ -38,7 +38,9 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	final String QueryGetLastEventId = "SELECT id FROM event ORDER BY id DESC LIMIT 1;";
 	final String QueryGetUserIdByMail = "SELECT id FROM user WHERE email = ?;";
 	final String QueryGetOpenEventsByUserid = "SELECT event,name FROM member as m LEFT JOIN event as e ON e.id = m.event WHERE e.editable = 1 and m.user = ? ;";
-
+	final String QueryGetEventData = "SELECT name,place,event_time,proof_compulsory,payment,user,editable,comment FROM event WHERE id = ?;";
+	final String QueryGetEventParticipants = "SELECT u.username FROM member as m LEFT JOIN user as u ON u.id = m.user WHERE m.event = ? ;";
+	final String QueryDeleteEventById = "DELETE FROM event WHERE id = ? and user = ?;";
 	Connection connection;
 
 	// create session and store userId
@@ -52,7 +54,86 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	public DB_UsermanagementServiceImpl() {
 
 	}
+	
+	public void deleteEventById(int event_id) {
+		String userIdStr = session.getAttribute("userId").toString();
+		if (!userIdStr.equals("")) {
+			int userId = Integer.parseInt(userIdStr);
+			connection = this.getConn();
+		
+			try {
+				PreparedStatement qry = connection
+						.prepareStatement(this.QueryDeleteEventById);
+				qry.setInt(1, event_id);
+				qry.setInt(2, userId);
+				qry.execute();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public Event getEventData(int event_id) {
+		Event event = new Event();
+		// make sure userId is set
+		String userIdStr = session.getAttribute("userId").toString();
+		if (!userIdStr.equals("")) {
+			int userId = Integer.parseInt(userIdStr);
+			connection = this.getConn();
 
+			try {
+
+				PreparedStatement qry = connection
+						.prepareStatement(this.QueryGetEventData);
+				qry.setInt(1, event_id);
+				
+				ResultSet resultSet = qry.executeQuery();
+				
+				while (resultSet.next()) {
+					
+					event.id = event_id;
+					event.name = resultSet.getString(1);
+					event.place = resultSet.getString(2);
+					event.event_time = resultSet.getString(3);
+					event.proof_compulsory = resultSet.getInt(4);
+					event.payment = resultSet.getString(5);
+					event.owner	= (resultSet.getInt(6)==userId);
+					event.editable = resultSet.getInt(7);
+					event.comment = resultSet.getString(8);
+				}
+				
+				qry = connection
+						.prepareStatement(this.QueryGetEventParticipants);
+				qry.setInt(1, event_id);
+				
+				resultSet = qry.executeQuery();
+				
+				
+				List<String> participants= new ArrayList<String>();
+				
+				while (resultSet.next()) {
+					
+					participants.add(resultSet.getString(1));
+				}
+				
+				String[] participants_arr = new String[participants.size()];
+				
+				for(int i = 0 ; i < participants.size(); i++) {
+					participants_arr[i] = participants.get(i);
+				}
+				
+				event.participants = participants_arr;
+				
+				connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return event;
+	}
+	
 	/**
 	 * This is a private addUserToEvent function This ll not close a connection
 	 * or check for login or anything else
@@ -224,7 +305,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 
-		}Window.alert(String.valueOf(res));
+		}
 		return res;
 	}
 
