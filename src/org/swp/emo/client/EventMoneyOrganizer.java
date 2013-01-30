@@ -1,17 +1,24 @@
 package org.swp.emo.client;
 
+import org.swp.emo.client.widget.Notice;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.NotificationMole;
+import com.google.gwt.user.client.ui.RootPanel;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class EventMoneyOrganizer implements EntryPoint {
 
-	@Override
+	public static Notice notice = new Notice();
+	
 	public void onModuleLoad() {
+		RootPanel.get().add(notice); 
 		this.chooseWidget();
+		
 		
 	}
 	
@@ -22,7 +29,7 @@ public class EventMoneyOrganizer implements EntryPoint {
 		// -1 ist nicht eingeloggt, alles andere sind die userids
 		if(cookie != null && !cookie.equals("-1"))
 		{
-			//Window.alert("Du bist eingeloggt, userid: " + cookie);
+			notice.setTextAnimatedWithAutohide("Du bist eingeloggt, userid: " + cookie);
 			
 			Mainpage mainpage = new Mainpage();
 			
@@ -30,7 +37,7 @@ public class EventMoneyOrganizer implements EntryPoint {
 		else
 		{
 			Usermanagement usermanagement = new Usermanagement();
-			Window.alert("Du bist nicht eingeloggt, userid: " + cookie);
+			//Window.alert("Du bist nicht eingeloggt, userid: " + cookie);
 		}
 	}
 

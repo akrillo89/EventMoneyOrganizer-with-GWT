@@ -1,5 +1,15 @@
 package org.swp.emo.client;
 
+import java.util.Date;
+
+import org.swp.emo.client.content.Startpage;
+import org.swp.emo.client.content.Widget_CreateEvent;
+import org.swp.emo.client.widget.Widget_FlexExampleTable;
+import org.swp.emo.client.widget.Widget_ListBoxChangeLanguage;
+import org.swp.emo.shared.DB_UsermanagementService;
+import org.swp.emo.shared.DB_UsermanagementServiceAsync;
+import org.swp.emo.shared.Event;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.SelectionEvent;
@@ -8,7 +18,10 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.Cookies;
+
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -38,14 +51,18 @@ public class Mainpage {
 	
 	private EventMoneyOrganizerMessages messages = GWT.create(EventMoneyOrganizerMessages.class);
 	
+	private static DB_UsermanagementServiceAsync userSvc = GWT.create(DB_UsermanagementService.class);
 	//content
-	public ScrollPanel contentPanel = new ScrollPanel(new Label("Hallo"));
+	public static ScrollPanel contentPanel = new ScrollPanel(new Label("Hallo"));
+	
+	static TreeItem runningEvents = null;
 	/**
 	 * Constuctor: create the main menu panel and initialize the content panel
 	 */
 	Mainpage() {
 		this.setupMainMenu();
 		this.addContentPanel();
+		contentPanel.setWidget(new Startpage());
 	}
 
 
@@ -139,11 +156,16 @@ public class Mainpage {
 		final TreeItem createNewEvent = eventPanel.addItem(createEasyItem(messages.createNewEvent(), Resources.INSTANCE.createNewEventIcon()));
 		
 		
-		final TreeItem runningEvents = eventPanel.addTextItem(messages.running() + " " + messages.events());
+		runningEvents = eventPanel.addTextItem(messages.running() + " " + messages.events());
+	
+
 		
-		final TreeItem runningEvents_1 = addItem(runningEvents, Resources.INSTANCE.eventIcon(), "Test");
-		final TreeItem runningEvents_2 = addItem(runningEvents, Resources.INSTANCE.eventIcon(), "Test 2");
 		
+		
+//		final TreeItem runningEvents_1 = addItem(runningEvents, Resources.INSTANCE.eventIcon(), "Test");
+//		final TreeItem runningEvents_2 = addItem(runningEvents, Resources.INSTANCE.eventIcon(), "Test 2");
+		
+		refreshOpenEvents();
 		
 		
 		final TreeItem closedEvents = eventPanel.addTextItem(messages.closed() + " " + messages.events());
@@ -162,14 +184,6 @@ public class Mainpage {
 		        else if(event.getSelectedItem() == closedEvents) 
 		        {
 		        	Window.alert("Closed");	
-		        }
-		        else if(event.getSelectedItem() == runningEvents_1)
-		        {
-		        	contentPanel.setWidget(new Widget_FlexExampleTable(1));
-		        }
-		        else if(event.getSelectedItem() == runningEvents_2)
-		        {
-		        	contentPanel.setWidget(new Widget_FlexExampleTable(2));
 		        }
 		        else if(event.getSelectedItem() == closedEvents_1)
 		        {
@@ -194,7 +208,35 @@ public class Mainpage {
 		return eventPanel;
 	}
 	
-	 /**
+	public static void refreshOpenEvents() {
+		addOpenEvents(runningEvents);
+	}
+	
+	 private static void addOpenEvents(final TreeItem runningEvents) {
+		 runningEvents.removeItems();
+		// Set up the callback object.
+		    AsyncCallback<Event[]> callback = new AsyncCallback<Event[]>() {
+		      public void onFailure(Throwable caught) {
+		        // TODO: Do something with errors.
+		      }
+
+		      public void onSuccess(Event[] result) {
+		    	  for(int i = 0 ; i < result.length; i++)
+		    	  {
+		    		  addItem(runningEvents, Resources.INSTANCE.eventIcon(), result[i].name);  
+		    	  }
+		    	  
+		      }
+		    };
+
+		    // Make the call to the stock price service.
+		    userSvc.getOpenEvents(callback);
+		
+	}
+
+
+
+	/**
 	   * Create the {@link Tree} of Mail options.
 	 * @param Images 
 	   * 
@@ -235,7 +277,7 @@ public class Mainpage {
 		
 	}
 	
-	private TreeItem addItem(TreeItem root, ImageResource image, String label) {
+	private static TreeItem addItem(TreeItem root, ImageResource image, String label) {
 		SafeHtmlBuilder sb = new SafeHtmlBuilder();
 		sb.append(SafeHtmlUtils.fromTrustedString(AbstractImagePrototype
 				.create(image).getHTML()));
