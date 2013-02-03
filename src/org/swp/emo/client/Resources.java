@@ -13,5 +13,12 @@ public interface Resources extends ClientBundle {
 	@Source("/images/add-event.png")
 	public ImageResource createNewEventIcon();
 	
+	@Source("/images/payment.png")
+	public ImageResource payment();
+	
+	@Source("/images/rechnungen.png")
+	public ImageResource bills();
+	
+	
 	
 }

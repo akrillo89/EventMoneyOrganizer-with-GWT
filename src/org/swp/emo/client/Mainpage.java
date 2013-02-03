@@ -294,8 +294,8 @@ public class Mainpage {
 //		paymentPanelRoot.setState(true);
 		
 		Tree paymentPanel = new Tree();
-		final TreeItem openPayments = paymentPanel.addItem(createEasyItem(messages.openPayments(), Resources.INSTANCE.eventIcon()));
-		final TreeItem finishedPayments = paymentPanel.addItem(createEasyItem(messages.finishedPayments(), Resources.INSTANCE.eventIcon()));
+		final TreeItem openPayments = paymentPanel.addItem(createEasyItem(messages.openPayments(), Resources.INSTANCE.payment()));
+		final TreeItem finishedPayments = paymentPanel.addItem(createEasyItem(messages.finishedPayments(), Resources.INSTANCE.bills()));
 		
 		//Onclick handler for eventPanel
 		paymentPanel.addSelectionHandler(new SelectionHandler<TreeItem>()
