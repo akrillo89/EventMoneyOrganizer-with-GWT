@@ -94,5 +94,11 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 
 	   @DefaultMessage("Account created")
 	   String AccountCreated();
+
+	   @DefaultMessage("Open payments")
+	   String openPayments();
+
+	   @DefaultMessage("Finshed payments")
+	   String finishedPayments();
 	   
 	}

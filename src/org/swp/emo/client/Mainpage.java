@@ -283,21 +283,39 @@ public class Mainpage {
 	   * @return the {@link Tree} of mail options
 	   */
 	private Widget createPaymentItem() {
+//		TreeItem paymentPanelRoot = paymentPanel.addTextItem("Amounts outstanding");
+//		addItem(paymentPanelRoot, Resources.INSTANCE.eventIcon(), "Test",0);
+//		addItem(paymentPanelRoot, Resources.INSTANCE.eventIcon(), "Test 2",0);
+//		
+//		TreeItem paymentPanelRootClosed = paymentPanel.addTextItem("Amounts paid");
+//		addItem(paymentPanelRootClosed, Resources.INSTANCE.eventIcon(), "Closed Test",0);
+//		addItem(paymentPanelRootClosed, Resources.INSTANCE.eventIcon(), "Closed Test 2",0);
+//		
+//		paymentPanelRoot.setState(true);
+		
 		Tree paymentPanel = new Tree();
-		TreeItem paymentPanelRoot = paymentPanel.addTextItem("Amounts outstanding");
-		addItem(paymentPanelRoot, Resources.INSTANCE.eventIcon(), "Test",0);
-		addItem(paymentPanelRoot, Resources.INSTANCE.eventIcon(), "Test 2",0);
+		final TreeItem openPayments = paymentPanel.addItem(createEasyItem(messages.openPayments(), Resources.INSTANCE.eventIcon()));
+		final TreeItem finishedPayments = paymentPanel.addItem(createEasyItem(messages.finishedPayments(), Resources.INSTANCE.eventIcon()));
 		
-		TreeItem paymentPanelRootClosed = paymentPanel.addTextItem("Amounts paid");
-		addItem(paymentPanelRootClosed, Resources.INSTANCE.eventIcon(), "Closed Test",0);
-		addItem(paymentPanelRootClosed, Resources.INSTANCE.eventIcon(), "Closed Test 2",0);
-		
-		paymentPanelRoot.setState(true);
-		
-		paymentPanel.addItem(createEasyItem("Test1", Resources.INSTANCE.eventIcon()));
-		
-		
-		
+		//Onclick handler for eventPanel
+		paymentPanel.addSelectionHandler(new SelectionHandler<TreeItem>()
+		{
+		    public void onSelection(SelectionEvent<TreeItem> event)
+		    {
+		        if(event.getSelectedItem() == openPayments)
+		        {
+		        	//TODO Mohamed, set your widget
+		        	//contentPanel.setWidget();
+		        	Window.alert("openPayments");
+		        }
+		        else if(event.getSelectedItem() == finishedPayments)
+		        {
+		        	//TODO Mohamed, set your widget
+		        	//contentPanel.setWidget();
+		        	Window.alert("finshedPayments");
+		        }
+		    }
+		});
 		return paymentPanel;
 	}
 
