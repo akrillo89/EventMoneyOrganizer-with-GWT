@@ -115,6 +115,29 @@ public class Event_show extends FlexTable {
 	  			self.setWidget(6, 1, deleteEvent);
 		  		
 	  		}
+	  		
+	  		// Posten hinzufügen
+	  		self.setWidget(7, 0, new Label());
+	  		Button addPost = new Button(messages.post());
+	  		addPost.addClickHandler(new ClickHandler() {
+	  			AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+	  				
+				      public void onFailure(Throwable caught) {
+				    	  EventMoneyOrganizer.notice.setTextAnimatedWithAutohide(messages.error());
+				      }
+
+				      public void onSuccess(Void result) {
+				    	  Mainpage.contentPanel.setWidget(new Widget_CreatePost(event_id));
+				      }
+				    };
+		  			
+					public void onClick(ClickEvent event) {
+						Mainpage.contentPanel.setWidget(new Widget_CreatePost(event_id));
+					}
+					
+	  		});
+	  		self.setWidget(7, 1, addPost);
+	  		
 	      }
 	    };
 

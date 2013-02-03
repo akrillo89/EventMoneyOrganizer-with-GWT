@@ -101,4 +101,16 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 	   @DefaultMessage("Finshed payments")
 	   String finishedPayments();
 	   
+	   @DefaultMessage("Post")
+	   String post();
+	   
+	   @DefaultMessage("Cost")
+	   String cost();
+
+	   @DefaultMessage("Bill")
+	   String bill();
+
+	   @DefaultMessage("Add Post")
+	   String addPost();
+	   
 	}

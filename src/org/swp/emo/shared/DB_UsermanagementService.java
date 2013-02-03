@@ -1,5 +1,6 @@
 package org.swp.emo.shared;
 
+
 import com.google.gwt.user.client.rpc.RemoteService;
 
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -11,5 +12,5 @@ public interface DB_UsermanagementService extends RemoteService{
 	public int checkLogin(String username, String password);
 	public void registerEvent(String name, String place, String event_time, boolean proof_compulsory, String payment, String comment, String usermails );
 	public int registerUser(String username, String password, String email);
-	
+	public void registerPost(int event, String name, double cost, byte[] bill, String comment);
 }

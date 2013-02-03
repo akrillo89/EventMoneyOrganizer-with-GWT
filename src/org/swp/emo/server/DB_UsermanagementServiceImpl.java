@@ -1,5 +1,6 @@
 package org.swp.emo.server;
 
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,6 +36,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	final String QueryCheckLogin = "SELECT id FROM user WHERE password = md5(?) AND username = ?;";
 	final String QueryAddEvent = "INSERT INTO event(name,place,event_time,proof_compulsory,payment,user,editable,comment) VALUES (?,?,?,?,?,?,?,?);";
 	final String QueryAddUserToEvent = "INSERT INTO member(event,user) VALUES(? , ?);";
+	final String QueryAddPost = "INSERT INTO post(event,user,name,cost,bill,accept,comment) VALUES (?,?,?,?,?,?,?);";
 	final String QueryGetLastEventId = "SELECT id FROM event ORDER BY id DESC LIMIT 1;";
 	final String QueryGetUserIdByMail = "SELECT id FROM user WHERE email = ?;";
 	final String QueryGetOpenEventsByUserid = "SELECT event,name FROM member as m LEFT JOIN event as e ON e.id = m.event WHERE e.editable = 1 and m.user = ? ;";
@@ -368,4 +370,30 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 		return users;
 	}
 
+	@Override
+	public void registerPost(int event, String name, double cost, byte[] bill, String comment) {
+		String userIdStr = session.getAttribute("userId").toString();
+		if (!userIdStr.equals("")) {
+			int userId = Integer.parseInt(userIdStr);
+			connection = this.getConn();
+
+			try {
+				PreparedStatement qry = connection
+						.prepareStatement(this.QueryAddPost);
+				qry.setInt(1, event);	//event
+				qry.setLong(2, userId);		//user
+				qry.setString(3, name);		//name
+				qry.setDouble(4, cost); 	//cost
+				qry.setBytes(5, bill);		//bill
+				qry.setInt(6, 0);			//accept
+				qry.setString(7, comment);	//comment
+
+				qry.execute();
+
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
