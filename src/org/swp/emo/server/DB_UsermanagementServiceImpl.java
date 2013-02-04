@@ -45,7 +45,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	final String QueryGetEventData = "SELECT name,place,event_time,proof_compulsory,payment,user,editable,comment FROM event WHERE id = ?;";
 	final String QueryGetEventParticipants = "SELECT u.username FROM member as m LEFT JOIN user as u ON u.id = m.user WHERE m.event = ? ;";
 	final String QueryDeleteEventById = "DELETE FROM event WHERE id = ? and user = ?;";
-	Connection connection;
+	
 
 	// create session and store userId
 	/*
@@ -63,7 +63,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 		String userIdStr = session.getAttribute("userId").toString();
 		if (!userIdStr.equals("")) {
 			int userId = Integer.parseInt(userIdStr);
-			connection = this.getConn();
+			Connection connection = this.getConn();
 		
 			try {
 				PreparedStatement qry = connection
@@ -84,7 +84,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 		String userIdStr = session.getAttribute("userId").toString();
 		if (!userIdStr.equals("")) {
 			int userId = Integer.parseInt(userIdStr);
-			connection = this.getConn();
+			Connection connection = this.getConn();
 
 			try {
 
@@ -145,7 +145,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	 * @param event_id
 	 * @param user_id
 	 */
-	private void addUserToEvent(int event_id, int user_id) {
+	private void addUserToEvent(int event_id, int user_id, Connection connection) {
 		try {
 			PreparedStatement qry = connection
 					.prepareStatement(this.QueryAddUserToEvent);
@@ -164,7 +164,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 		String userIdStr = session.getAttribute("userId").toString();
 		if (!userIdStr.equals("")) {
 			int userId = Integer.parseInt(userIdStr);
-			connection = this.getConn();
+			Connection connection = this.getConn();
 
 			try {
 
@@ -205,7 +205,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 		String userIdStr = session.getAttribute("userId").toString();
 		if (!userIdStr.equals("")) {
 			int userId = Integer.parseInt(userIdStr);
-			connection = this.getConn();
+			Connection connection = this.getConn();
 
 			try {
 				PreparedStatement qry = connection
@@ -259,13 +259,13 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 					while (resultSet.next()) {
 						mail_user_id = resultSet.getInt(1);
 
-						addUserToEvent(event_id, mail_user_id);
+						addUserToEvent(event_id, mail_user_id,connection);
 					}
 				}
 
 				// add owner
 
-				addUserToEvent(event_id, userId);
+				addUserToEvent(event_id, userId,connection);
 
 				connection.close();
 			} catch (SQLException e) {
@@ -280,7 +280,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	 * 
 	 */
 	public int registerUser(String username, String password, String email) {
-		connection = this.getConn();
+		Connection connection = this.getConn();
 		int res = 1 ;
 
 		try {
@@ -317,7 +317,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 		session = getThreadLocalRequest().getSession();
 
 		int id = -1;
-		connection = this.getConn();
+		Connection connection = this.getConn();
 		boolean found = false;
 		try {
 			PreparedStatement qry = connection
@@ -350,7 +350,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	 */
 	public List<String> getAllUser() {
 
-		connection = this.getConn();
+		Connection connection = this.getConn();
 
 		List<String> users = new ArrayList<String>();
 
@@ -377,7 +377,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 		String userIdStr = session.getAttribute("userId").toString();
 		if (!userIdStr.equals("")) {
 			int userId = Integer.parseInt(userIdStr);
-			connection = this.getConn();
+			Connection connection = this.getConn();
 
 			try {
 				PreparedStatement qry = connection
@@ -407,7 +407,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 		String userIdStr = session.getAttribute("userId").toString();
 		if (!userIdStr.equals("")) {
 			int userId = Integer.parseInt(userIdStr);
-			connection = this.getConn();
+			Connection connection = this.getConn();
 			List<Post> postList= new ArrayList<Post>();
 			try {
 

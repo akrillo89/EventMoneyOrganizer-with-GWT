@@ -6,6 +6,7 @@ import org.swp.emo.client.Mainpage;
 import org.swp.emo.shared.DB_UsermanagementService;
 import org.swp.emo.shared.DB_UsermanagementServiceAsync;
 import org.swp.emo.shared.Event;
+import org.swp.emo.shared.Post;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -63,13 +64,14 @@ public class Event_show extends FlexTable {
 				// Teilnehmer
 				self.setWidget(4, 0, new Label(messages.participants()));
 				String participants = "";
-				System.out.println(result.participants.toString());
-				for (String p : result.participants)
-					participants += p + ",";
-				if (participants.length() > 0)
-					participants = participants.substring(0,
-							participants.length() - 1);
-
+				if(result.participants != null)
+				{
+					for (String p : result.participants)
+						participants += p + ",";
+					if (participants.length() > 0)
+						participants = participants.substring(0,
+								participants.length() - 1);
+				}
 				self.setWidget(4, 1, new Label(participants));
 
 				// Choose what kind of event ( here u can select if result
@@ -151,53 +153,53 @@ public class Event_show extends FlexTable {
 			}
 		};
 
-		// final AsyncCallback<Post[]> callback2 = new AsyncCallback<Post[]>() {
-		// public void onFailure(Throwable caught) {
-		// EventMoneyOrganizer.notice.setTextAnimatedWithAutohide(messages.error());
-		// }
-		//
-		// public void onSuccess(Post[] result) {
-		// // Posten hinzufügen
-		//
-		//		Grid grid = new Grid(4, 4);
-		//		int numRows = grid.getRowCount();
-		//		int numColumns = grid.getColumnCount();
-		//		for (int row = 0; row < numRows; row++) {
-		//			for (int col = 0; col < numColumns; col++) {
-		//				grid.setText(row, col, "bla");
-		//			}
-		//		}
-		//		self.setWidget(7, 0, grid);
-		//
-		//		self.setWidget(8, 0, new Label());
-		//		Button addPost = new Button(messages.post());
-		//		addPost.addClickHandler(new ClickHandler() {
-		//			AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-		//
-		//				public void onFailure(Throwable caught) {
-		//					EventMoneyOrganizer.notice
-		//							.setTextAnimatedWithAutohide(messages
-		//									.error());
-		//				}
-		//
-		//				public void onSuccess(Void result) {
-		//					Mainpage.contentPanel
-		//							.setWidget(new Widget_CreatePost(event_id));
-		//				}
-		//			};
-		//
-		//			public void onClick(ClickEvent event) {
-		//				Mainpage.contentPanel.setWidget(new Widget_CreatePost(
-		//						event_id));
-		//			}
-		//
-		//		});
-		//		self.setWidget(8, 1, addPost);
-		//	}
-		// };
+		 final AsyncCallback<Post[]> callback2 = new AsyncCallback<Post[]>() {
+		 public void onFailure(Throwable caught) {
+		 EventMoneyOrganizer.notice.setTextAnimatedWithAutohide(messages.error());
+		 }
+		
+		 public void onSuccess(Post[] result) {
+		 // Posten hinzufügen
+		
+				Grid grid = new Grid(4, 4);
+				int numRows = grid.getRowCount();
+				int numColumns = grid.getColumnCount();
+				for (int row = 0; row < numRows; row++) {
+					for (int col = 0; col < numColumns; col++) {
+						grid.setText(row, col, "bla");
+					}
+				}
+				self.setWidget(7, 0, grid);
+		
+				self.setWidget(8, 0, new Label());
+				Button addPost = new Button(messages.post());
+				addPost.addClickHandler(new ClickHandler() {
+					AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+		
+						public void onFailure(Throwable caught) {
+							EventMoneyOrganizer.notice
+									.setTextAnimatedWithAutohide(messages
+											.error());
+						}
+		
+						public void onSuccess(Void result) {
+							Mainpage.contentPanel
+									.setWidget(new Widget_CreatePost(event_id));
+						}
+					};
+		
+					public void onClick(ClickEvent event) {
+						Mainpage.contentPanel.setWidget(new Widget_CreatePost(
+								event_id));
+					}
+		
+				});
+				self.setWidget(8, 1, addPost);
+			}
+		 };
 
 		// Make the call to the stock price service.
 		userSvc.getEventData(event_id, callback);
-		// userSvc.getPost(event_id, callback2);
+		 userSvc.getPost(event_id, callback2);
 	}
 }
