@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 
 import org.swp.emo.shared.DB_UsermanagementService;
 import org.swp.emo.shared.Event;
+import org.swp.emo.shared.Post;
 
 import com.google.gwt.user.client.Window;
 
@@ -37,6 +38,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	final String QueryAddEvent = "INSERT INTO event(name,place,event_time,proof_compulsory,payment,user,editable,comment) VALUES (?,?,?,?,?,?,?,?);";
 	final String QueryAddUserToEvent = "INSERT INTO member(event,user) VALUES(? , ?);";
 	final String QueryAddPost = "INSERT INTO post(event,user,name,cost,bill,accept,comment) VALUES (?,?,?,?,?,?,?);";
+	final String QueryGetPost = "SELECT id,user,name,cost,bill,accept,comment FROM post WHERE event = ?;";
 	final String QueryGetLastEventId = "SELECT id FROM event ORDER BY id DESC LIMIT 1;";
 	final String QueryGetUserIdByMail = "SELECT id FROM user WHERE email = ?;";
 	final String QueryGetOpenEventsByUserid = "SELECT event,name FROM member as m LEFT JOIN event as e ON e.id = m.event WHERE e.editable = 1 and m.user = ? ;";
@@ -395,5 +397,49 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public Post[] getPost(int event_id) {
+		Post post = new Post();
+		Post[] result = null;
+		// make sure userId is set
+		String userIdStr = session.getAttribute("userId").toString();
+		if (!userIdStr.equals("")) {
+			int userId = Integer.parseInt(userIdStr);
+			connection = this.getConn();
+			List<Post> postList= new ArrayList<Post>();
+			try {
+
+				PreparedStatement qry = connection
+						.prepareStatement(this.QueryGetPost);
+				qry.setInt(1, event_id);
+				
+				ResultSet resultSet = qry.executeQuery();
+				
+				while (resultSet.next()) {
+					post.id = resultSet.getInt(1);
+					post.event_id = event_id;
+					post.user_id = resultSet.getInt(2);
+					post.name = resultSet.getString(3);
+					post.cost = resultSet.getDouble(4);
+					post.bill = resultSet.getBytes(5);
+					post.accept	= resultSet.getInt(6);
+					post.comment = resultSet.getString(7);
+					postList.add(post);
+				}
+				
+				connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			result = new Post[postList.size()];
+			
+			for(int i = 0 ; i < postList.size(); i++) {
+				result[i] = postList.get(i);
+			}
+		}
+		return result;
 	}
 }
