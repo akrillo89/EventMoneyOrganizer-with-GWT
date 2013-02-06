@@ -15,4 +15,5 @@ public interface DB_UsermanagementService extends RemoteService{
 	public void registerEvent(String name, String place, String event_time, boolean proof_compulsory, String payment, String comment, String usermails );
 	public int registerUser(String username, String password, String email);
 	public void registerPost(int event, String name, double cost, byte[] bill, String comment);
+	public void updateEvent(String name, String place, String event_time,boolean proof_compulsory, String payment, String comment,String userMailsStr, int event_id);
 }

@@ -113,4 +113,10 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 	   @DefaultMessage("Add Post")
 	   String addPost();
 	   
+	   @DefaultMessage("Edit Event")
+	   String editEvent();
+
+	   @DefaultMessage("Event edited, you ll be redirected to you event show page")
+	   String editEventAndYoullBeRedirected();
+	   
 	}

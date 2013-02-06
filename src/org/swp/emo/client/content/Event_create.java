@@ -139,6 +139,7 @@ public class Event_create extends FlexTable {
 				    }
 				    if(participantsStr.length() > 0)
 				    	participantsStr = participantsStr.substring(0, participantsStr.length()-1);
+				    System.out.println("FullDate: " + full_date.toString());
 				    userSvc.registerEvent(eventNameInput.getText(), locationArea.getText(), full_date.toString(), forceBill.getValue(), chooseType.getItemText(chooseType.getSelectedIndex()), descriptionArea.getValue(),participantsStr, callback);
 				}
 				else

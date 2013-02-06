@@ -85,7 +85,15 @@ public class Event_show extends FlexTable {
 						new Label(Integer.toString(result.proof_compulsory)));
 
 				if (result.owner == true) {
-					self.setWidget(6, 0, new Label());
+					Button editEvent = new Button(messages.editEvent());
+					editEvent.addClickHandler(new ClickHandler() {
+
+						public void onClick(ClickEvent event) {
+							Mainpage.contentPanel.setWidget(new Event_edit(event_id));
+						}
+
+					});
+					self.setWidget(6, 0, editEvent);
 					Button deleteEvent = new Button(messages.delete());
 					deleteEvent.addClickHandler(new ClickHandler() {
 
@@ -150,6 +158,8 @@ public class Event_show extends FlexTable {
 
 				});
 				self.setWidget(8, 1, addPost);
+				
+				
 			}
 		};
 

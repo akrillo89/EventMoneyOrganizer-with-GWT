@@ -12,6 +12,8 @@ public class Event implements IsSerializable  {
 	public String payment;
 	public String comment;
 	public String[] participants;
+	public String[] participantsMail;
+	
 	public boolean owner;
 	public int editable; 
 }

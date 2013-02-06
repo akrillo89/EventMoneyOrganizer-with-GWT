@@ -26,6 +26,8 @@ import com.google.gwt.user.client.ui.TextBox;
 public class InputListWidget extends Composite {
     List<String> itemsSelected = new ArrayList<String>();
 
+    final BulletList list = new BulletList();
+    final TextBox itemBox = new TextBox();
     public InputListWidget() {
         FlowPanel panel = new FlowPanel();
         initWidget(panel);
@@ -38,11 +40,10 @@ public class InputListWidget extends Composite {
         </ul>
         <div class="token-input-dropdown-facebook" style="display: none;"/>
          */
-        final BulletList list = new BulletList();
+        
         list.setStyleName("token-input-list-facebook");
         final ListItem item = new ListItem();
         item.setStyleName("token-input-input-token-facebook");
-        final TextBox itemBox = new TextBox();
         itemBox.getElement().setAttribute("style", "outline-color: -moz-use-text-color; outline-style: none; outline-width: medium;");
         final SuggestBox box = new SuggestBox(getSuggestions(), itemBox);
         box.getElement().setId("suggestion_box");
@@ -163,8 +164,13 @@ public class InputListWidget extends Composite {
     }
     
 
-public List<String> getItemsSelected() {
+    public List<String> getItemsSelected() {
 		return itemsSelected;
+	}
+    
+    public void addItemsSelected(String ele) {
+    	itemBox.setText(ele);
+    	deselectItem(itemBox, list);
 	}
 
 /**

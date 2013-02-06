@@ -11,5 +11,5 @@ public interface DB_UsermanagementServiceAsync {
 	public void registerEvent(String name, String place, String event_time, boolean proof_compulsory, String payment, String comment, String userEmails,AsyncCallback<Void> callback );
 	public void registerUser(String username, String password, String email, AsyncCallback<Integer> callbackreg);
 	public void registerPost(int eventId, String name, double cost, byte[] bill, String comment, AsyncCallback<Void> callback);
-	
+	public void updateEvent(String name, String place, String event_time,boolean proof_compulsory, String payment, String comment,String userMailsStr, int event_id, AsyncCallback<Void> callback);
 }

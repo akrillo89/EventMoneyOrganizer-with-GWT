@@ -21,6 +21,7 @@ import org.swp.emo.shared.Event;
 import org.swp.emo.shared.Post;
 
 import com.google.gwt.user.client.Window;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 /**
  * I extend the DB_Conn abstract class, then I don't have to rewrite code
@@ -36,6 +37,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	final String QueryAddUser = "INSERT INTO user (username, password, email) VALUES (?,md5(?),?);";
 	final String QueryCheckLogin = "SELECT id FROM user WHERE password = md5(?) AND username = ?;";
 	final String QueryAddEvent = "INSERT INTO event(name,place,event_time,proof_compulsory,payment,user,editable,comment) VALUES (?,?,?,?,?,?,?,?);";
+	final String QueryEditEvent = "UPDATE event SET name = ?,place = ?,event_time = ?,proof_compulsory = ?,payment = ?, user = ?,editable = ?,comment = ? WHERE id = ?;";
 	final String QueryAddUserToEvent = "INSERT INTO member(event,user) VALUES(? , ?);";
 	final String QueryAddPost = "INSERT INTO post(event,user,name,cost,bill,accept,comment) VALUES (?,?,?,?,?,?,?);";
 	final String QueryGetPost = "SELECT id,user,name,cost,bill,accept,comment FROM post WHERE event = ?;";
@@ -43,9 +45,9 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 	final String QueryGetUserIdByMail = "SELECT id FROM user WHERE email = ?;";
 	final String QueryGetOpenEventsByUserid = "SELECT event,name FROM member as m LEFT JOIN event as e ON e.id = m.event WHERE e.editable = 1 and m.user = ? ;";
 	final String QueryGetEventData = "SELECT name,place,event_time,proof_compulsory,payment,user,editable,comment FROM event WHERE id = ?;";
-	final String QueryGetEventParticipants = "SELECT u.username FROM member as m LEFT JOIN user as u ON u.id = m.user WHERE m.event = ? ;";
+	final String QueryGetEventParticipants = "SELECT u.username, u.email, m.user FROM member as m LEFT JOIN user as u ON u.id = m.user WHERE m.event = ? ;";
 	final String QueryDeleteEventById = "DELETE FROM event WHERE id = ? and user = ?;";
-	
+	final String QueryDeleteMemberOfEvent = "DELETE FROM member WHERE user = ? AND event = ?;";
 
 	// create session and store userId
 	/*
@@ -70,6 +72,25 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 						.prepareStatement(this.QueryDeleteEventById);
 				qry.setInt(1, event_id);
 				qry.setInt(2, userId);
+				qry.execute();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void deleteUserFromEvent(int user_id, int event_id) {
+		String userIdStr = session.getAttribute("userId").toString();
+		if (!userIdStr.equals("")) {
+			int userId = Integer.parseInt(userIdStr);
+			Connection connection = this.getConn();
+		
+			try {
+				PreparedStatement qry = connection
+						.prepareStatement(this.QueryDeleteMemberOfEvent);
+				qry.setInt(1, user_id);
+				qry.setInt(2, event_id);
 				qry.execute();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -115,19 +136,28 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 				
 				
 				List<String> participants= new ArrayList<String>();
+				List<String> participantsMail = new ArrayList<String>();
 				
 				while (resultSet.next()) {
 					
 					participants.add(resultSet.getString(1));
+					participantsMail.add(resultSet.getString(2));
 				}
 				
 				String[] participants_arr = new String[participants.size()];
+				String[] participantsMail_arr = new String[participantsMail.size()];
 				
 				for(int i = 0 ; i < participants.size(); i++) {
 					participants_arr[i] = participants.get(i);
 				}
 				
+				for(int i = 0 ; i < participantsMail.size(); i++) {
+					participantsMail_arr[i] = participantsMail.get(i);
+				}
+				
 				event.participants = participants_arr;
+				event.participantsMail = participantsMail_arr;
+				
 				
 				connection.close();
 			} catch (SQLException e) {
@@ -152,6 +182,8 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 			qry.setInt(1, event_id);
 			qry.setInt(2, user_id);
 			qry.execute();
+		} catch (MySQLIntegrityConstraintViolationException e) {
+			System.out.println("User " + user_id + "@Event " + event_id + " still exists. => skipp");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -198,6 +230,100 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 		return result;
 	}
 
+	public void updateEvent(String name, String place, String event_time,boolean proof_compulsory, String payment, String comment,String userMailsStr, int event_id) {
+		// make sure userId is set
+		String userIdStr = session.getAttribute("userId").toString();
+		if (!userIdStr.equals("")) {
+			int ownerId = Integer.parseInt(userIdStr);
+			Connection connection = this.getConn();
+
+			try {
+				PreparedStatement qry = connection
+						.prepareStatement(this.QueryEditEvent);
+				qry.setString(1, name);
+				qry.setString(2, place);
+
+				SimpleDateFormat sdf = new SimpleDateFormat(
+						"EEE MMM dd HH:mm:ss Z yyyy", new Locale("us"));
+				SimpleDateFormat mysqlSdf = new SimpleDateFormat(
+						"YYYY-MM-dd HH:MM:SS", new Locale("us"));
+				Date date = null;
+				;
+				try {
+					date = sdf.parse(event_time);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				qry.setString(3, mysqlSdf.format(date));
+				qry.setInt(4, (proof_compulsory) ? 1 : 0); // cast bool to int
+				qry.setString(5, payment);
+				qry.setInt(6, ownerId);
+				qry.setInt(7, 1); // editable
+				qry.setString(8, comment);
+				qry.setInt(9, event_id);
+
+				
+				qry.execute();
+
+
+				//get user of edit event, add if possible ( event, user ) is unique, so it ll be ok if this entry still exists
+				int mail_user_id;
+
+				String[] userMails = userMailsStr.split(",");
+				List<Integer> userEdit = new ArrayList<Integer>();
+				for (String mail : userMails) {
+					// get userid
+					qry = connection
+							.prepareStatement(this.QueryGetUserIdByMail);
+					qry.setString(1, mail);
+					ResultSet resultSet = qry.executeQuery();
+					while (resultSet.next()) {
+						mail_user_id = resultSet.getInt(1);
+						userEdit.add(mail_user_id);
+						addUserToEvent(event_id, mail_user_id,connection);
+					}
+				}
+				
+			//get all participants ids to check if some 1 got removed
+			qry = connection
+					.prepareStatement(this.QueryGetEventParticipants);
+			qry.setInt(1, event_id);
+			
+			ResultSet resultSet = qry.executeQuery();
+			
+			
+			List<Integer> userExists = new ArrayList<Integer>();
+			
+			while (resultSet.next()) {
+				
+				userExists.add(resultSet.getInt(3));
+			}
+			
+			//delete all user that does not exist in editUserList
+			System.out.println("userEdit:  " + userEdit);
+			System.out.println("userExists:  " + userExists);
+			
+			for(int user : userExists) {
+				if(userEdit.indexOf(user) == -1 && user !=  ownerId)
+				{
+					System.out.println("Remove user: " + user + " From event: " + event_id);
+					deleteUserFromEvent(user,event_id);
+				}
+			}
+			
+
+				
+				connection.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void registerEvent(String name, String place, String event_time,
 			boolean proof_compulsory, String payment, String comment,
 			String userMailsStr) {
@@ -216,7 +342,7 @@ public class DB_UsermanagementServiceImpl extends DB_Conn implements
 				SimpleDateFormat sdf = new SimpleDateFormat(
 						"EEE MMM dd HH:mm:ss Z yyyy", new Locale("us"));
 				SimpleDateFormat mysqlSdf = new SimpleDateFormat(
-						"YYYY-MM-DD HH:MM:SS", new Locale("us"));
+						"YYYY-MM-dd HH:MM:SS", new Locale("us"));
 				Date date = null;
 				;
 				try {
